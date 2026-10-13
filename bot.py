@@ -28,7 +28,7 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # -------------------------------------------------------------
-# /session Slash Command Group (Central & ERM style)
+# /session Slash Command Group
 # -------------------------------------------------------------
 class SessionGroup(app_commands.Group):
     def __init__(self):
@@ -43,7 +43,7 @@ class SessionGroup(app_commands.Group):
             timestamp=datetime.datetime.now()
         )
         embed.add_field(name="🌐 Roblox Private Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="low", description="Sends a Low Player Count message")
@@ -55,7 +55,7 @@ class SessionGroup(app_commands.Group):
             timestamp=datetime.datetime.now()
         )
         embed.add_field(name="🌐 Join Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="shutdown", description="Shutdown the current session")
@@ -66,7 +66,7 @@ class SessionGroup(app_commands.Group):
             color=discord.Color.red(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="vote", description="Start or schedule a session vote")
@@ -78,7 +78,7 @@ class SessionGroup(app_commands.Group):
             color=discord.Color.blue(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
         
         # Add default vote reactions
@@ -94,7 +94,7 @@ class SessionGroup(app_commands.Group):
             color=discord.Color.purple(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="boost", description="Ask for more players to join the running session")
@@ -106,7 +106,7 @@ class SessionGroup(app_commands.Group):
             timestamp=datetime.datetime.now()
         )
         embed.add_field(name="🌐 Join Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="config", description="Manage the session config")
@@ -124,7 +124,7 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="Session Ping Role", value="`Not Configured`", inline=True)
         embed.add_field(name="Default Vote Goal", value="`5 Votes`", inline=True)
         embed.add_field(name="Server Link", value="`Set in Code`", inline=True)
-        embed.set_footer(text="GMU Session Control | Central & ERM Standard")
+        embed.set_footer(text="GMU Session Control")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # Register the command group
