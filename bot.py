@@ -34,6 +34,9 @@ ROBLOX_SERVER_LINK = "https://www.roblox.com"
 ERLC_SERVER_CODE = "ProjectGM"
 STAFF_ROLE_ID = 1559605936887173250 # Staff role ID for pings, permissions, and ticket claiming
 
+# Paste your direct image URL for the Project Greater Manchester banner here
+EMBED_IMAGE_URL = "https://your-image-url-here.png" 
+
 # -------------------------------------------------------------
 # Ticket System Components
 # -------------------------------------------------------------
@@ -123,6 +126,8 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
             timestamp=datetime.datetime.now()
         )
         embed.set_footer(text="Project Greater Manchester | Ticket System")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
 
         ping_content = f"<@&{STAFF_ROLE_ID}>"
 
@@ -153,6 +158,8 @@ async def ticket_panel(interaction: discord.Interaction):
         color=discord.Color.blue()
     )
     embed.set_footer(text="Project Greater Manchester Support")
+    if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+        embed.set_image(url=EMBED_IMAGE_URL)
     
     await interaction.channel.send(embed=embed, view=CreateTicketView())
     await interaction.response.send_message("Ticket panel posted successfully!", ephemeral=True)
@@ -175,6 +182,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="🔑 ERLC Server Code", value=f"`{ERLC_SERVER_CODE}`", inline=True)
         embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=True)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="low", description="Sends a Low Player Count message")
@@ -188,6 +197,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="🔑 ERLC Server Code", value=f"`{ERLC_SERVER_CODE}`", inline=True)
         embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=True)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="shutdown", description="Shutdown the current session")
@@ -199,6 +210,8 @@ class SessionGroup(app_commands.Group):
             timestamp=datetime.datetime.now()
         )
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="vote", description="Start or schedule a session vote")
@@ -213,6 +226,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="🔑 ERLC Server Code", value=f"`{ERLC_SERVER_CODE}`", inline=True)
         embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=True)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
         
         message = await interaction.original_response()
@@ -230,6 +245,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="🔑 ERLC Server Code", value=f"`{ERLC_SERVER_CODE}`", inline=True)
         embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=True)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="boost", description="Ask for more players to join the running session")
@@ -243,6 +260,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="🔑 ERLC Server Code", value=f"`{ERLC_SERVER_CODE}`", inline=True)
         embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=True)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="config", description="Manage the session config")
@@ -261,6 +280,8 @@ class SessionGroup(app_commands.Group):
         embed.add_field(name="Default Vote Goal", value="`5 Votes`", inline=True)
         embed.add_field(name="Server Link", value=f"`{ROBLOX_SERVER_LINK}`", inline=False)
         embed.set_footer(text="Project Greater Manchester Session Control")
+        if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+            embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # Register the command group
@@ -268,8 +289,26 @@ session_group = SessionGroup()
 bot.tree.add_command(session_group)
 
 # -------------------------------------------------------------
-# Additional Department Commands
+# Additional Department & About Commands
 # -------------------------------------------------------------
+@bot.tree.command(name="about", description="Information about the Project Greater Manchester bot.")
+async def about(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="About Project Greater Manchester",
+        description=(
+            "The bot serving Project Greater Manchester RP\n"
+            "Bringing a happy server to ERLC join now!\n"
+            "Link: https://discord.gg/EkJqV5aGB\n\n"
+            "**Bot made by:** notrandomgames"
+        ),
+        color=discord.Color.blue(),
+        timestamp=datetime.datetime.now()
+    )
+    embed.set_footer(text="Project Greater Manchester Information")
+    if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+        embed.set_image(url=EMBED_IMAGE_URL)
+    await interaction.response.send_message(embed=embed)
+
 @bot.tree.command(name="announce", description="Post an official department announcement.")
 @app_commands.describe(title="Announcement Title", message="Announcement content")
 async def announce(interaction: discord.Interaction, title: str, message: str):
@@ -284,6 +323,8 @@ async def announce(interaction: discord.Interaction, title: str, message: str):
         timestamp=datetime.datetime.now()
     )
     embed.set_footer(text="Project Greater Manchester | Utilities Division")
+    if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+        embed.set_image(url=EMBED_IMAGE_URL)
     
     await interaction.response.send_message("Announcement posted successfully!", ephemeral=True)
     await interaction.channel.send(embed=embed)
@@ -301,6 +342,8 @@ async def links(interaction: discord.Interaction):
     embed.add_field(name="💻 CAD System", value="[Access CAD Portal](https://example.com)", inline=False)
     embed.add_field(name="📜 Community Rules", value="Check our main rules channel.", inline=False)
     embed.set_footer(text="Project Greater Manchester Information System")
+    if EMBED_IMAGE_URL and EMBED_IMAGE_URL != "https://your-image-url-here.png":
+        embed.set_image(url=EMBED_IMAGE_URL)
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
