@@ -93,9 +93,9 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
         guild = interaction.guild
         user = interaction.user
 
-        # Create permissions for ticket channel (Private to user and staff)
+        # Strict permission overwrites: Deny everyone else, allow only the user and staff role
         overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
             user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
             guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
         }
