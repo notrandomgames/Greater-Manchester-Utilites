@@ -32,6 +32,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # -------------------------------------------------------------
 ROBLOX_SERVER_LINK = "https://www.roblox.com"
 ERLC_SERVER_CODE = "ProjectGM"
+STAFF_PING_ID = "1559605936887173250" # Role or user ID to ping when a ticket opens
 
 # -------------------------------------------------------------
 # Ticket System Components
@@ -90,7 +91,11 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
         )
         embed.set_footer(text="Project Greater Manchester | Ticket System")
 
-        await ticket_channel.send(embed=embed, view=CloseTicketView())
+        # Ping the staff role/user along with the embed message
+        # Note: Use <@&ID> if it's a role, or <@ID> if it's a user. Defaulting to role format below:
+        ping_content = f"<@&{STAFF_PING_ID}>"
+
+        await ticket_channel.send(content=ping_content, embed=embed, view=CloseTicketView())
         await interaction.response.send_message(
             f"Ticket created! Head over to {ticket_channel.mention} to talk with staff.", 
             ephemeral=True
