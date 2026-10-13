@@ -28,10 +28,98 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # -------------------------------------------------------------
-# Configuration: Update with your link and ERLC code if needed
+# Configuration: Update with your details
 # -------------------------------------------------------------
 ROBLOX_SERVER_LINK = "https://www.roblox.com"
 ERLC_SERVER_CODE = "ProjectGM"
+
+# -------------------------------------------------------------
+# Ticket System Components
+# -------------------------------------------------------------
+class CloseTicketView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.danger, emoji="🔒", custom_id="close_ticket_btn")
+    async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Closing this ticket in 5 seconds...")
+        await discord.utils.sleep_until(datetime.datetime.now() + datetime.timedelta(seconds=5))
+        await interaction.channel.delete()
+
+class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
+    subject = discord.ui.TextInput(
+        label="Subject / Topic",
+        placeholder="e.g., General Support, Report, Department Inquiry",
+        required=True
+    )
+    details = discord.ui.TextInput(
+        label="How can staff help you today?",
+        style=discord.TextStyle.paragraph,
+        placeholder="Provide as much detail as possible...",
+        required=True
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        user = interaction.user
+
+        # Create permissions for ticket channel (Private to user and staff)
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+        }
+
+        # Create ticket channel under a category if possible
+        category = discord.utils.get(guild.categories, name="TICKETS")
+        if not category:
+            category = await guild.create_category("TICKETS")
+
+        channel_name = f"ticket-{user.name}".lower().replace(" ", "-")
+        ticket_channel = await guild.create_text_channel(
+            name=channel_name,
+            category=category,
+            overwrites=overwrites
+        )
+
+        embed = discord.Embed(
+            title=f"🎫 Support Ticket - {self.subject.value}",
+            description=f"Welcome {user.mention}! A staff member will be with you shortly.\n\n**Reason:**\n{self.details.value}",
+            color=discord.Color.blue(),
+            timestamp=datetime.datetime.now()
+        )
+        embed.set_footer(text="Project Greater Manchester | Ticket System")
+
+        await ticket_channel.send(embed=embed, view=CloseTicketView())
+        await interaction.response.send_message(
+            f"Ticket created! Head over to {ticket_channel.mention} to talk with staff.", 
+            ephemeral=True
+        )
+
+class CreateTicketView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Open Ticket", style=discord.ButtonStyle.primary, emoji="📩", custom_id="open_ticket_btn")
+    async def open_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(TicketModal())
+
+# Ticket Panel Slash Command
+@bot.tree.command(name="ticket-panel", description="Post the support ticket panel embed (Admin only).")
+async def ticket_panel(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("You need Administrator permissions to set up the ticket panel.", ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        title="📩 Project Greater Manchester - Support Tickets",
+        description="Need assistance, have a question, or want to report an issue?\n\nClick the **Open Ticket** button below to create a private support ticket with our staff team.",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Project Greater Manchester Support")
+    
+    await interaction.channel.send(embed=embed, view=CreateTicketView())
+    await interaction.response.send_message("Ticket panel posted successfully!", ephemeral=True)
 
 # -------------------------------------------------------------
 # /session Slash Command Group
@@ -182,6 +270,9 @@ async def links(interaction: discord.Interaction):
 
 @bot.event
 async def on_ready():
+    # Register persistent views so buttons keep working after bot restarts
+    bot.add_view(CreateTicketView())
+    bot.add_view(CloseTicketView())
     await bot.tree.sync()
     print(f"Project Greater Manchester Bot logged in as {bot.user} (ID: {bot.user.id})")
 
