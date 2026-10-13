@@ -68,7 +68,7 @@ class TicketControlView(discord.ui.View):
         embed.add_field(name="Claimed By", value=interaction.user.mention, inline=False)
 
         await interaction.response.edit_message(embed=embed, view=self)
-        await interaction.followup.send(f"Ticket successfully claimed by {interaction.user.mention}! Other staff members can no longer message here.")
+        await interaction.followup.send(f"Ticket successfully claimed by {interaction.user.mention}!")
 
     @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.danger, emoji="🔒", custom_id="close_ticket_btn")
     async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
