@@ -283,7 +283,7 @@ session_group = SessionGroup()
 bot.tree.add_command(session_group)
 
 # -------------------------------------------------------------
-# AFK Slash Command
+# AFK Slash Command (Clean Embed without Banner Image)
 # -------------------------------------------------------------
 @bot.tree.command(name="afk", description="Set your AFK status.")
 @app_commands.describe(reason="Reason for being AFK")
@@ -298,8 +298,6 @@ async def afk(interaction: discord.Interaction, reason: str = "AFK"):
         color=discord.Color.orange(),
         timestamp=datetime.datetime.now()
     )
-    if EMBED_IMAGE_URL:
-        embed.set_image(url=EMBED_IMAGE_URL)
     embed.set_footer(text="Project Greater Manchester Status System")
     await interaction.response.send_message(embed=embed)
 
