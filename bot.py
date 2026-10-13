@@ -37,6 +37,9 @@ STAFF_ROLE_ID = 1559605936887173250 # Staff role ID for pings, permissions, and 
 # Your custom banner image link
 EMBED_IMAGE_URL = "https://media.discordapp.net/attachments/1559552110373249196/1559613155230089236/IMG_6730.webp?ex=6acfb670&is=6ace64f0&hm=bb02d9d67f6d1e8e79c8f27279071eb2c4a5bb85758ebcb2f88d3beb21dd9ad4&=&format=webp"
 
+# Dictionary to store active AFK users: {user_id: {"reason": str, "time": datetime}}
+AFK_USERS = {}
+
 # -------------------------------------------------------------
 # Ticket System Components
 # -------------------------------------------------------------
@@ -46,27 +49,22 @@ class TicketControlView(discord.ui.View):
 
     @discord.ui.button(label="Claim Ticket", style=discord.ButtonStyle.success, emoji="🙋‍♂️", custom_id="claim_ticket_btn")
     async def claim_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Check if user has the staff role or manage messages permission
         has_role = any(role.id == STAFF_ROLE_ID for role in interaction.user.roles)
         
         if not (has_role or interaction.user.guild_permissions.manage_messages):
             await interaction.response.send_message("You do not have permission to claim this ticket.", ephemeral=True)
             return
 
-        # Restrict other staff members from messaging in this channel
         staff_role = interaction.guild.get_role(STAFF_ROLE_ID)
         if staff_role:
             await interaction.channel.set_permissions(staff_role, send_messages=False)
         
-        # Grant explicit permission to the claiming staff member
         await interaction.channel.set_permissions(interaction.user, read_messages=True, send_messages=True)
 
-        # Disable claim button and update label
         button.disabled = True
         button.label = f"Claimed by {interaction.user.display_name}"
         button.style = discord.ButtonStyle.secondary
 
-        # Update embed to show claimed status
         embed = interaction.message.embeds[0]
         embed.add_field(name="Claimed By", value=interaction.user.mention, inline=False)
 
@@ -96,7 +94,6 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
         guild = interaction.guild
         user = interaction.user
 
-        # Strict permission overwrites: Deny everyone else, allow only the user and staff role
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
             user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
@@ -107,7 +104,6 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
         if staff_role:
             overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
 
-        # Create ticket channel under a category if possible
         category = discord.utils.get(guild.categories, name="TICKETS")
         if not category:
             category = await guild.create_category("TICKETS")
@@ -145,7 +141,6 @@ class CreateTicketView(discord.ui.View):
     async def open_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TicketModal())
 
-# Ticket Panel Slash Command
 @bot.tree.command(name="ticket-panel", description="Post the support ticket panel embed (Admin only).")
 async def ticket_panel(interaction: discord.Interaction):
     if not interaction.user.guild_permissions.administrator:
@@ -284,9 +279,29 @@ class SessionGroup(app_commands.Group):
             embed.set_image(url=EMBED_IMAGE_URL)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-# Register the command group
 session_group = SessionGroup()
 bot.tree.add_command(session_group)
+
+# -------------------------------------------------------------
+# AFK Slash Command
+# -------------------------------------------------------------
+@bot.tree.command(name="afk", description="Set your AFK status.")
+@app_commands.describe(reason="Reason for being AFK")
+async def afk(interaction: discord.Interaction, reason: str = "AFK"):
+    AFK_USERS[interaction.user.id] = {
+        "reason": reason,
+        "time": datetime.datetime.now()
+    }
+    embed = discord.Embed(
+        title="💤 AFK Status Set",
+        description=f"{interaction.user.mention} is now AFK: **{reason}**",
+        color=discord.Color.orange(),
+        timestamp=datetime.datetime.now()
+    )
+    if EMBED_IMAGE_URL:
+        embed.set_image(url=EMBED_IMAGE_URL)
+    embed.set_footer(text="Project Greater Manchester Status System")
+    await interaction.response.send_message(embed=embed)
 
 # -------------------------------------------------------------
 # Additional Department & About Commands
@@ -347,9 +362,38 @@ async def links(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+# -------------------------------------------------------------
+# Event Listener for AFK Check & Auto-Unafk
+# -------------------------------------------------------------
+@bot.event
+async def on_message(message: discord.Message):
+    if message.author.bot:
+        return
+
+    # 1. If the message author is AFK, remove their AFK status automatically
+    if message.author.id in AFK_USERS:
+        afk_data = AFK_USERS.pop(message.author.id)
+        duration = datetime.datetime.now() - afk_data["time"]
+        minutes = int(duration.total_seconds() // 60)
+        
+        await message.channel.send(
+            f"Welcome back, {message.author.mention}! Your AFK status has been removed (you were away for {minutes} minute(s)).",
+            delete_after=8
+        )
+
+    # 2. Check if any mentioned users in the message are currently AFK
+    if message.mentions:
+        for mentioned_user in message.mentions:
+            if mentioned_user.id in AFK_USERS:
+                afk_data = AFK_USERS[mentioned_user.id]
+                reason = afk_data["reason"]
+                time_ago = afk_data["time"].strftime("%H:%M:%S")
+                await message.reply(f"⚠️ **{mentioned_user.name}** is currently AFK since {time_ago}: **{reason}**")
+
+    await bot.process_commands(message)
+
 @bot.event
 async def on_ready():
-    # Register persistent views so buttons keep working after bot restarts
     bot.add_view(CreateTicketView())
     bot.add_view(TicketControlView())
     await bot.tree.sync()
