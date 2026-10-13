@@ -11,7 +11,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "GMU Bot is active and online!"
+    return "ProjectGM Bot is active and online!"
 
 def run_web():
     port = int(os.environ.get("PORT", 10000))
@@ -28,57 +28,63 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # -------------------------------------------------------------
-# /session Slash Command Group
+# Configuration: Change this to your actual ProjectGM server link
+# -------------------------------------------------------------
+ROBLOX_SERVER_LINK = "https://www.roblox.com"
+
+# -------------------------------------------------------------
+# /session Slash Command Group (ProjectGM Standard)
 # -------------------------------------------------------------
 class SessionGroup(app_commands.Group):
     def __init__(self):
-        super().__init__(name="session", description="Manage Greater Manchester Utilities server sessions")
+        super().__init__(name="session", description="Manage ProjectGM server sessions")
 
     @app_commands.command(name="start", description="Start a session")
     async def start(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="⚡ Greater Manchester Utilities - Session Started",
-            description="The GMU Roleplay session has officially commenced! Join the server below to take part in utility operations across Greater Manchester.",
+            title="⚡ ProjectGM - Session Started",
+            description="The Greater Manchester Utilities roleplay session has officially commenced! Join the server below to take part in utility operations.",
             color=discord.Color.green(),
             timestamp=datetime.datetime.now()
         )
-        embed.add_field(name="🌐 Roblox Private Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join Server]({ROBLOX_SERVER_LINK})", inline=False)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="low", description="Sends a Low Player Count message")
     async def low(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="⚠️ GMU Session - Low Player Count Notice",
-            description="Player count in the GMU server is currently low. Additional field units and utility technicians are needed to keep operations active!",
+            title="⚠️ ProjectGM - Low Player Count Notice",
+            description="Player count in the ProjectGM server is currently low. Additional field units and utility technicians are needed!",
             color=discord.Color.gold(),
             timestamp=datetime.datetime.now()
         )
-        embed.add_field(name="🌐 Join Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join Server]({ROBLOX_SERVER_LINK})", inline=False)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="shutdown", description="Shutdown the current session")
     async def shutdown(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="🛑 Greater Manchester Utilities - Session Shutdown",
-            description="The current utility roleplay session has ended. Thank you to all GMU staff and emergency personnel who participated!",
+            title="🛑 ProjectGM - Session Shutdown",
+            description="The current utility roleplay session has ended. Thank you to all ProjectGM staff and emergency personnel who participated!",
             color=discord.Color.red(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control")
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="vote", description="Start or schedule a session vote")
     @app_commands.describe(duration="Voting duration (e.g. 15 minutes, 30 minutes)", goal="Required vote goal to start session")
     async def vote(self, interaction: discord.Interaction, duration: str = "15 minutes", goal: int = 5):
         embed = discord.Embed(
-            title="📊 Greater Manchester Utilities - Session Vote",
-            description=f"Vote below if you want to hold a GMU roleplay session!\n\n**Goal:** {goal} votes required within **{duration}**.",
+            title="📊 ProjectGM - Session Vote",
+            description=f"Vote below if you want to hold a ProjectGM roleplay session!\n\n**Goal:** {goal} votes required within **{duration}**.",
             color=discord.Color.blue(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join Server]({ROBLOX_SERVER_LINK})", inline=False)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
         
         # Add default vote reactions
@@ -89,24 +95,25 @@ class SessionGroup(app_commands.Group):
     @app_commands.command(name="full", description="Sends a Full Server message")
     async def full(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="🔥 GMU Session - Server Full Alert",
-            description="The Greater Manchester Utilities server is currently **FULL**! Queue up or wait for a slot to open.",
+            title="🔥 ProjectGM - Server Full Alert",
+            description="The ProjectGM server is currently **FULL**! Queue up or wait for a slot to open.",
             color=discord.Color.purple(),
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join Server]({ROBLOX_SERVER_LINK})", inline=False)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="boost", description="Ask for more players to join the running session")
     async def boost(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="🚀 Session Boost Request!",
-            description="We are seeking additional players to boost the active session! Hop into Greater Manchester and support active grid operations.",
+            title="🚀 ProjectGM - Session Boost Request",
+            description="We are seeking additional players to boost the active ProjectGM session! Hop into Greater Manchester and support active grid operations.",
             color=discord.Color.dark_orange(),
             timestamp=datetime.datetime.now()
         )
-        embed.add_field(name="🌐 Join Server", value="[Click Here to Join Server](https://www.roblox.com)", inline=False)
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join Server]({ROBLOX_SERVER_LINK})", inline=False)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="config", description="Manage the session config")
@@ -116,15 +123,15 @@ class SessionGroup(app_commands.Group):
             return
 
         embed = discord.Embed(
-            title="⚙️ GMU Session Configuration Panel",
-            description="Manage and customize session system configurations for Greater Manchester Utilities.",
+            title="⚙️ ProjectGM - Session Configuration Panel",
+            description="Manage and customize session system configurations for ProjectGM.",
             color=discord.Color.dark_grey(),
             timestamp=datetime.datetime.now()
         )
         embed.add_field(name="Session Ping Role", value="`Not Configured`", inline=True)
         embed.add_field(name="Default Vote Goal", value="`5 Votes`", inline=True)
-        embed.add_field(name="Server Link", value="`Set in Code`", inline=True)
-        embed.set_footer(text="GMU Session Control")
+        embed.add_field(name="Server Link", value=f"`{ROBLOX_SERVER_LINK}`", inline=True)
+        embed.set_footer(text="ProjectGM Session Control")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # Register the command group
@@ -142,35 +149,35 @@ async def announce(interaction: discord.Interaction, title: str, message: str):
         return
 
     embed = discord.Embed(
-        title=f"📢 GMU Official Notice: {title}",
+        title=f"📢 ProjectGM Official Notice: {title}",
         description=message,
         color=discord.Color.blue(),
         timestamp=datetime.datetime.now()
     )
-    embed.set_footer(text="Greater Manchester Utilities | ERLC Roleplay")
+    embed.set_footer(text="ProjectGM | Greater Manchester Utilities")
     
     await interaction.response.send_message("Announcement posted successfully!", ephemeral=True)
     await interaction.channel.send(embed=embed)
 
-@bot.tree.command(name="links", description="Get official Greater Manchester Utilities links (Roblox server, CAD, etc.).")
+@bot.tree.command(name="links", description="Get official ProjectGM & GMU links (Roblox server, CAD, etc.).")
 async def links(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="Greater Manchester Utilities - Quick Links",
-        description="Access all official GMU and ERLC community platforms below:",
+        title="ProjectGM - Quick Links",
+        description="Access all official ProjectGM and Greater Manchester Utilities platforms below:",
         color=discord.Color.orange(),
         timestamp=datetime.datetime.now()
     )
-    embed.add_field(name="🌐 Roblox Private Server", value="[Click Here to Join](https://www.roblox.com)", inline=False)
+    embed.add_field(name="🌐 Roblox Private Server", value=f"[Click Here to Join]({ROBLOX_SERVER_LINK})", inline=False)
     embed.add_field(name="💻 GMU CAD System", value="[Access CAD Portal](https://example.com)", inline=False)
     embed.add_field(name="📜 Community Rules", value="Check our main rules channel.", inline=False)
-    embed.set_footer(text="GMU Information System")
+    embed.set_footer(text="ProjectGM Information System")
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f"Greater Manchester Utilities Bot logged in as {bot.user} (ID: {bot.user.id})")
+    print(f"ProjectGM Bot logged in as {bot.user} (ID: {bot.user.id})")
 
 if __name__ == "__main__":
     keep_alive()
