@@ -361,32 +361,36 @@ async def links(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # -------------------------------------------------------------
-# Event Listener for AFK Check & Auto-Unafk
+# Event Listener for AFK Check & Auto-Unafk (With Error Catching)
 # -------------------------------------------------------------
 @bot.event
 async def on_message(message: discord.Message):
     if message.author.bot:
         return
 
-    # 1. If the message author is AFK, remove their AFK status automatically
-    if message.author.id in AFK_USERS:
-        afk_data = AFK_USERS.pop(message.author.id)
-        duration = datetime.datetime.now() - afk_data["time"]
-        minutes = int(duration.total_seconds() // 60)
-        
-        await message.channel.send(
-            f"Welcome back, {message.author.mention}! Your AFK status has been removed (you were away for {minutes} minute(s)).",
-            delete_after=8
-        )
+    try:
+        # 1. If the message author is AFK, remove their AFK status automatically
+        if message.author.id in AFK_USERS:
+            afk_data = AFK_USERS.pop(message.author.id)
+            duration = datetime.datetime.now() - afk_data["time"]
+            minutes = int(duration.total_seconds() // 60)
+            
+            await message.channel.send(
+                f"Welcome back, {message.author.mention}! Your AFK status has been removed (you were away for {minutes} minute(s)).",
+                delete_after=8
+            )
 
-    # 2. Check if any mentioned users in the message are currently AFK
-    if message.mentions:
-        for mentioned_user in message.mentions:
-            if mentioned_user.id in AFK_USERS:
-                afk_data = AFK_USERS[mentioned_user.id]
-                reason = afk_data["reason"]
-                time_ago = afk_data["time"].strftime("%H:%M:%S")
-                await message.reply(f"⚠️ **{mentioned_user.name}** is currently AFK since {time_ago}: **{reason}**")
+        # 2. Check if any mentioned users in the message are currently AFK
+        if message.mentions:
+            for mentioned_user in message.mentions:
+                if mentioned_user.id in AFK_USERS:
+                    afk_data = AFK_USERS[mentioned_user.id]
+                    reason = afk_data["reason"]
+                    time_ago = afk_data["time"].strftime("%H:%M:%S")
+                    await message.reply(f"⚠️ **{mentioned_user.name}** is currently AFK since {time_ago}: **{reason}**")
+
+    except Exception as e:
+        print(f"Error in on_message AFK handler: {e}")
 
     await bot.process_commands(message)
 
