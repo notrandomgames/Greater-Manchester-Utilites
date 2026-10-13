@@ -32,7 +32,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # -------------------------------------------------------------
 ROBLOX_SERVER_LINK = "https://www.roblox.com"
 ERLC_SERVER_CODE = "ProjectGM"
-STAFF_ROLE_ID = 1559605936887173250 # Staff role ID for pings and ticket claiming
+STAFF_ROLE_ID = 1559605936887173250 # Staff role ID for pings, permissions, and ticket claiming
 
 # -------------------------------------------------------------
 # Ticket System Components
@@ -50,6 +50,14 @@ class TicketControlView(discord.ui.View):
             await interaction.response.send_message("You do not have permission to claim this ticket.", ephemeral=True)
             return
 
+        # Restrict other staff members from messaging in this channel
+        staff_role = interaction.guild.get_role(STAFF_ROLE_ID)
+        if staff_role:
+            await interaction.channel.set_permissions(staff_role, send_messages=False)
+        
+        # Grant explicit permission to the claiming staff member
+        await interaction.channel.set_permissions(interaction.user, read_messages=True, send_messages=True)
+
         # Disable claim button and update label
         button.disabled = True
         button.label = f"Claimed by {interaction.user.display_name}"
@@ -60,7 +68,7 @@ class TicketControlView(discord.ui.View):
         embed.add_field(name="Claimed By", value=interaction.user.mention, inline=False)
 
         await interaction.response.edit_message(embed=embed, view=self)
-        await interaction.followup.send(f"Ticket successfully claimed by {interaction.user.mention}!")
+        await interaction.followup.send(f"Ticket successfully claimed by {interaction.user.mention}! Other staff members can no longer message here.")
 
     @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.danger, emoji="🔒", custom_id="close_ticket_btn")
     async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -91,6 +99,10 @@ class TicketModal(discord.ui.Modal, title="Open Support Ticket"):
             user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
             guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
         }
+
+        staff_role = guild.get_role(STAFF_ROLE_ID)
+        if staff_role:
+            overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
 
         # Create ticket channel under a category if possible
         category = discord.utils.get(guild.categories, name="TICKETS")
